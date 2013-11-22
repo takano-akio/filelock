@@ -4,7 +4,8 @@
 name:                filelock
 version:             0.1.0.0
 synopsis:            Portable interface to file locking (flock / LockFileEx)
--- description:         
+description:         This package provides an interface to Windows and Unix
+                     file locking functionalities.
 homepage:            http://github.com/takano-akio/filelock
 license:             PublicDomain
 license-file:        LICENSE
