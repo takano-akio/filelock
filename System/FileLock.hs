@@ -38,6 +38,8 @@ import Data.Typeable
 
 #ifdef USE_FLOCK
 import qualified System.FileLock.Internal.Flock as I
+#elif USE_LOCKFILEEX
+import qualified System.FileLock.Internal.LockFileEx as I
 #else
 #error No backend is available
 #endif
