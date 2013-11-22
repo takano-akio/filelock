@@ -2,8 +2,8 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                filelock
-version:             0.0.0.0
-synopsis:            Portable file locking (flock / LockFileEx)
+version:             0.1.0.0
+synopsis:            Portable interface to file locking (flock / LockFileEx)
 -- description:         
 homepage:            http://github.com/takano-akio/filelock
 license:             PublicDomain
