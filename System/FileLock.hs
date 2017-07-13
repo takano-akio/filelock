@@ -27,6 +27,7 @@ module System.FileLock
   , tryLockFile
   , unlockFile
   , withFileLock
+  , withTryFileLock
   ) where
 
 import Control.Applicative
@@ -81,6 +82,6 @@ unlockFile (Lock l ref) = do
 withFileLock :: FilePath -> SharedExclusive -> (FileLock -> IO a) -> IO a
 withFileLock path mode = E.bracket (lockFile path mode) unlockFile
 
--- | Perform some action with a lock held. Non-blocking.
-withTryLockFile :: FilePath -> SharedExclusive -> (FileLock -> IO a) -> IO (Maybe a)
-withTryLockFile path mode f = E.bracket (tryLockFile path mode) (traverse unlockFile) (traverse f)
+-- | Perform sme action with a lock held. Non-blocking.
+withTryFileLock :: FilePath -> SharedExclusive -> (FileLock -> IO a) -> IO (Maybe a)
+withTryFileLock path mode f = E.bracket (tryLockFile path mode) (traverse unlockFile) (traverse f)
