@@ -14,6 +14,7 @@ import Foreign.C.Types
 import System.Posix.Files
 import System.Posix.IO (openFd, closeFd, defaultFileFlags, OpenMode(..))
 import System.Posix.Types
+import Prelude
 
 type Lock = Fd
 
