@@ -19,6 +19,10 @@ main = do
       -> holdLock "exclusive" Exclusive duration
     ["try"]
       -> tryTakingLock
+    ["tryshared", read -> duration]
+      -> tryHoldLock "shared" Shared duration
+    ["tryexclusive", read -> duration]
+      -> tryHoldLock "exclusive" Exclusive duration
     _ -> void $ mapConcurrently id
       [ callSelf ["shared", "300"]
       , callSelf ["shared", "200"]
@@ -55,6 +59,17 @@ tryTakingLock = do
     Just l -> do
       putStrLn "lock was available"
       unlockFile l
+
+tryHoldLock :: String -> SharedExclusive -> Int -> IO ()
+tryHoldLock ty sex duration = do
+  res <- withTryFileLock lockfile sex $ \_ -> do
+    putStrLn $ "took " ++ desc
+    msleep duration
+  case res of
+    Nothing -> putStrLn "lock not available"
+    Just _  -> putStrLn $ "released " ++ desc
+  where
+    desc = ty ++ " lock"
 
 lockfile :: String
 lockfile = "lock"

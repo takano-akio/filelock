@@ -27,6 +27,7 @@ module System.FileLock
   , tryLockFile
   , unlockFile
   , withFileLock
+  , withTryFileLock
   ) where
 
 import Control.Applicative
@@ -77,6 +78,10 @@ unlockFile (Lock l ref) = do
   wasAlive <- atomicModifyIORef ref $ \old -> (False, old)
   when wasAlive $ I.unlock l
 
--- | Perform some action with a lock held.
+-- | Perform some action with a lock held. Blocks until the lock is available.
 withFileLock :: FilePath -> SharedExclusive -> (FileLock -> IO a) -> IO a
 withFileLock path mode = E.bracket (lockFile path mode) unlockFile
+
+-- | Perform sme action with a lock held. Non-blocking.
+withTryFileLock :: FilePath -> SharedExclusive -> (FileLock -> IO a) -> IO (Maybe a)
+withTryFileLock path mode f = E.bracket (tryLockFile path mode) (traverse unlockFile) (traverse f)
