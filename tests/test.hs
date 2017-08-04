@@ -6,11 +6,13 @@ import Control.Concurrent.Async
 import System.Environment
 import System.Exit
 import System.Process
+import System.IO
 
 import System.FileLock
 
 main :: IO ()
 main = do
+  hSetBuffering stdout LineBuffering
   args <- getArgs
   case args of
     ["shared", read -> duration]
@@ -23,20 +25,30 @@ main = do
       -> tryHoldLock "shared" Shared duration
     ["tryexclusive", read -> duration]
       -> tryHoldLock "exclusive" Exclusive duration
-    _ -> void $ mapConcurrently id
-      [ callSelf ["shared", "300"]
-      , callSelf ["shared", "200"]
-      , msleep 10 >> callSelf ["exclusive", "500"]
-      , msleep 20 >> callSelf ["try"]
-      , msleep 50 >> callSelf ["shared", "500"]
-      , msleep 700 >> callSelf ["shared", "10"]
-      , msleep 1500 >> callSelf ["try"]
-      ]
+    _ -> do
+      withFile "lock.log" WriteMode $ \h ->
+        void $ mapConcurrently id
+          [ callSelf h ["shared", "300"]
+          , callSelf h ["shared", "200"]
+          , msleep 10 >> callSelf h ["exclusive", "500"]
+          , msleep 20 >> callSelf h ["try"]
+          , msleep 50 >> callSelf h ["shared", "500"]
+          , msleep 700 >> callSelf h ["shared", "10"]
+          , msleep 1500 >> callSelf h ["try"]
+          ]
+      msleep 2000
+      log <- readFile "lock.log"
+      expected <- readFile "tests/lock.log.expected"
+      when (log /= expected) $ do
+        putStrLn "log mismatch!"
+        exitFailure
 
-callSelf :: [String] -> IO ()
-callSelf args = do
-  self <- getProgName
-  ExitSuccess <- rawSystem ("./" ++ self) args
+callSelf :: Handle -> [String] -> IO ()
+callSelf out args = do
+  self <- getExecutablePath
+  (_hin, _hout, _herr, ph) <- createProcess_ "callSelf"
+    (proc self args) { std_out = UseHandle out }
+  ExitSuccess <- waitForProcess ph
   return ()
 
 msleep :: Int -> IO ()

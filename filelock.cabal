@@ -33,3 +33,10 @@ library
   else
     cpp-options:      -DUSE_FLOCK
     build-depends:    unix
+
+test-suite test
+  type:               exitcode-stdio-1.0
+  hs-source-dirs:     tests
+  main-is:            test.hs
+  build-depends:      filelock, process, async, base
+  ghc-options:        -threaded
