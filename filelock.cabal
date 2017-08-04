@@ -10,7 +10,7 @@ homepage:            http://github.com/takano-akio/filelock
 license:             PublicDomain
 license-file:        LICENSE
 author:              Takano Akio
-maintainer:          aljee@hyper.cx
+maintainer:          tak@anoak.io
 -- copyright:           
 category:            System
 build-type:          Simple
