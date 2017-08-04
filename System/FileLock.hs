@@ -36,6 +36,7 @@ import Control.Monad
 import Data.IORef
 import Data.Traversable (traverse)
 import Data.Typeable
+import Prelude
 
 #ifdef USE_FLOCK
 import qualified System.FileLock.Internal.Flock as I
