@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                filelock
-version:             0.1.1.1
+version:             0.1.1.2
 synopsis:            Portable interface to file locking (flock / LockFileEx)
 description:         This package provides an interface to Windows and Unix
                      file locking functionalities.
