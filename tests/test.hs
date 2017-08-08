@@ -41,6 +41,10 @@ main = do
       expected <- readFile "tests/lock.log.expected"
       when (log /= expected) $ do
         putStrLn "log mismatch!"
+        putStrLn "log:"
+        putStrLn log
+        putStrLn "expected:"
+        putStrLn expected
         exitFailure
 
 callSelf :: Handle -> [String] -> IO ()
