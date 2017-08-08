@@ -39,6 +39,6 @@ test-suite test
   type:               exitcode-stdio-1.0
   hs-source-dirs:     tests
   main-is:            test.hs
-  build-depends:      filelock, process, async, base
+  build-depends:      filelock, process >= 1.2.1.0, async, base
   ghc-options:        -threaded
   default-language:   Haskell2010
