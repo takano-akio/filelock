@@ -3,6 +3,7 @@
 import Control.Monad
 import Control.Concurrent
 import Control.Concurrent.Async
+import Data.Maybe
 import System.Environment
 import System.Exit
 import System.Process
@@ -63,7 +64,7 @@ holdLock ty sex duration = do
   withFileLock lockfile sex $ \_ -> do
     putStrLn $ "took " ++ desc
     msleep duration
-  putStrLn $ "released " ++ desc
+    putStrLn $ "releasing " ++ desc
   where
     desc = ty ++ " lock"
 
@@ -81,9 +82,8 @@ tryHoldLock ty sex duration = do
   res <- withTryFileLock lockfile sex $ \_ -> do
     putStrLn $ "took " ++ desc
     msleep duration
-  case res of
-    Nothing -> putStrLn "lock not available"
-    Just _  -> putStrLn $ "released " ++ desc
+    putStrLn $ "released " ++ desc
+  when (isNothing res) $ putStrLn "lock not available"
   where
     desc = ty ++ " lock"
 
