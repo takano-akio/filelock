@@ -29,15 +29,15 @@ main = do
     _ -> do
       withFile "lock.log" WriteMode $ \h ->
         void $ mapConcurrently id
-          [ callSelf h ["shared", "300"]
-          , callSelf h ["shared", "200"]
-          , msleep 10 >> callSelf h ["exclusive", "500"]
-          , msleep 20 >> callSelf h ["try"]
-          , msleep 50 >> callSelf h ["shared", "500"]
-          , msleep 700 >> callSelf h ["shared", "10"]
-          , msleep 1500 >> callSelf h ["try"]
+          [ callSelf h ["shared", "5"]
+          , callSelf h ["shared", "2"]
+          , sleep 1 >> callSelf h ["exclusive", "3"]
+          , sleep 3 >> callSelf h ["try"]
+          , sleep 4 >> callSelf h ["shared", "1"]
+          , sleep 6 >> callSelf h ["shared", "1"]
+          , sleep 10 >> callSelf h ["try"]
           ]
-      msleep 2000
+      sleep 11
       log <- readFile "lock.log"
       expected <- readFile "tests/lock.log.expected"
       when (log /= expected) $ do
@@ -56,14 +56,14 @@ callSelf out args = do
   ExitSuccess <- waitForProcess ph
   return ()
 
-msleep :: Int -> IO ()
-msleep = threadDelay . (*1000)
+sleep :: Int -> IO ()
+sleep = threadDelay . (*1000000)
 
 holdLock :: String -> SharedExclusive -> Int -> IO ()
 holdLock ty sex duration = do
   withFileLock lockfile sex $ \_ -> do
     putStrLn $ "took " ++ desc
-    msleep duration
+    sleep duration
     putStrLn $ "releasing " ++ desc
   where
     desc = ty ++ " lock"
@@ -81,7 +81,7 @@ tryHoldLock :: String -> SharedExclusive -> Int -> IO ()
 tryHoldLock ty sex duration = do
   res <- withTryFileLock lockfile sex $ \_ -> do
     putStrLn $ "took " ++ desc
-    msleep duration
+    sleep duration
     putStrLn $ "released " ++ desc
   when (isNothing res) $ putStrLn "lock not available"
   where
