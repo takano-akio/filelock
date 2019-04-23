@@ -1,3 +1,5 @@
+{-# LANGUAGE InterruptibleFFI #-}
+
 module System.FileLock.Internal.Flock
 #ifndef USE_FLOCK
   () where
@@ -7,6 +9,7 @@ module System.FileLock.Internal.Flock
 #include <sys/file.h>
 
 import Control.Applicative
+import Control.Concurrent (yield)
 import qualified Control.Exception as E
 import Data.Bits
 import Foreign.C.Error
@@ -50,8 +53,12 @@ flock (Fd fd) exclusive block = do
       case () of
         _ | errno == eWOULDBLOCK
             -> return False -- already taken
-          | errno == eINTR
-            -> flock (Fd fd) exclusive block
+          | errno == eINTR -> do
+              -- If InterruptibleFFI interrupted the syscall with EINTR,
+              -- we need to give the accompanying Haskell exception a chance to bubble.
+              -- See also https://gitlab.haskell.org/ghc/ghc/issues/8684#note_142404.
+              E.interruptible yield
+              flock (Fd fd) exclusive block
           | otherwise -> throwErrno "flock"
   where
     modeOp = case exclusive of
@@ -61,7 +68,9 @@ flock (Fd fd) exclusive block = do
       True -> 0
       False -> #{const LOCK_NB}
 
-foreign import ccall "flock"
+-- `interruptible` so that async exceptions like `timeout` can stop it
+-- when used in blocking mode (without `LOCK_NB`).
+foreign import ccall interruptible "flock"
   c_flock :: CInt -> CInt -> IO CInt
 
 #endif /* USE_FLOCK */
