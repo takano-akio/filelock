@@ -12,7 +12,7 @@ import Data.Bits
 import Foreign.C.Error
 import Foreign.C.Types
 import System.Posix.Files
-import System.Posix.IO (openFd, closeFd, defaultFileFlags, OpenMode(..))
+import System.Posix.IO (openFd, closeFd, defaultFileFlags, OpenMode(..), setFdOption, FdOption(..))
 import System.Posix.Types
 import Prelude
 
@@ -38,7 +38,10 @@ unlock :: Lock -> IO ()
 unlock fd = closeFd fd
 
 open :: FilePath -> IO Fd
-open path = openFd path WriteOnly (Just stdFileMode) defaultFileFlags
+open path = do
+  fd <- openFd path WriteOnly (Just stdFileMode) defaultFileFlags
+  setFdOption fd CloseOnExec True
+  return fd
 
 flock :: Fd -> Bool -> Bool -> IO Bool
 flock (Fd fd) exclusive block = do
