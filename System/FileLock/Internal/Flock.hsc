@@ -67,7 +67,7 @@ flock (Fd fd) exclusive block = do
               -- If InterruptibleFFI interrupted the syscall with EINTR,
               -- we need to give the accompanying Haskell exception a chance to bubble.
               -- See also https://gitlab.haskell.org/ghc/ghc/issues/8684#note_142404.
-              E.interruptible yield
+              E.allowInterrupt
               flock (Fd fd) exclusive block
           | otherwise -> throwErrno "flock"
   where
