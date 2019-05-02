@@ -40,6 +40,13 @@ unlock fd = closeFd fd
 open :: FilePath -> IO Fd
 open path = do
   fd <- openFd path WriteOnly (Just stdFileMode) defaultFileFlags
+  -- Ideally, we would open the file descriptor with CLOEXEC enabled, but since
+  -- unix 2.8 hasn't been released yet and we want backwards compatibility with
+  -- older releases, we set CLOEXEC after opening the file descriptor.  This
+  -- may seem like a race condition at first. However, since the lock is always
+  -- taken after CLOEXEC is set, the worst that can happen is that a child
+  -- process inherits the open FD in an unlocked state. While non-ideal from a
+  -- performance standpoint, it doesn't introduce any locking bugs.
   setFdOption fd CloseOnExec True
   return fd
 
