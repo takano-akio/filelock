@@ -1,4 +1,5 @@
 import Control.Concurrent
+import Control.Exception
 import Control.Monad
 import System.FileLock
 import System.Exit
@@ -10,7 +11,9 @@ main = withFileLock lockFilePath Exclusive $ \_ -> do
   _ <- forkIO $ do
     -- The attempt to lock the file again should block, but it should be
     -- interrupted by the timeout, returning Nothing.
-    r <- timeout 1000000 $ lockFile lockFilePath Exclusive
+    --
+    -- Also masking shouldn't change interruptibility.
+    r <- timeout 1000000 $ mask $ \_ -> lockFile lockFilePath Exclusive
     _ <- swapMVar mvar (Just r)
     return ()
   threadDelay 2000000
