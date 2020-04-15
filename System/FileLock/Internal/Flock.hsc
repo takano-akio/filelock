@@ -1,3 +1,5 @@
+{-# LANGUAGE InterruptibleFFI #-}
+
 module System.FileLock.Internal.Flock
 #ifndef USE_FLOCK
   () where
@@ -75,7 +77,7 @@ flock (Fd fd) exclusive block = do
       True -> 0
       False -> #{const LOCK_NB}
 
-foreign import ccall "flock"
+foreign import ccall interruptible "flock"
   c_flock :: CInt -> CInt -> IO CInt
 
 #endif /* USE_FLOCK */

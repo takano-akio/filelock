@@ -1,3 +1,5 @@
+{-# LANGUAGE InterruptibleFFI #-}
+
 module System.FileLock.Internal.LockFileEx
 #ifndef USE_LOCKFILEEX
   () where
@@ -61,7 +63,7 @@ lockFirstByte handle exclusive block
     blockFlag = if block then 0 else #{const LOCKFILE_FAIL_IMMEDIATELY}
     sizeof_OVERLAPPED = #{size OVERLAPPED}
 
-foreign import stdcall "LockFileEx" c_lockFileEx
+foreign import stdcall interruptible "LockFileEx" c_lockFileEx
   :: HANDLE -> DWORD -> DWORD -> DWORD -> DWORD -> LPOVERLAPPED -> IO BOOL
 
 #endif /* USE_LOCKFILEEX */
