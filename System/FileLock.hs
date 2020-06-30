@@ -21,10 +21,9 @@
 -- Note on the implementation: currently the module uses flock(2) on non-Windows
 -- platforms, and LockFileEx on Windows.
 --
--- On non-Windows platforms, @InterruptibleFFI@ being used in the implementation
--- ensures that `Exclusive` lock calls (which issue blocking syscalls) can be
--- correctly interrupted by async exceptions (e.g. functions like `timeout`).
--- This has been tested on Linux.
+-- On non-Windows platforms, @InterruptibleFFI@ is used in the implementation to
+-- ensures that blocking lock calls can be correctly interrupted by async
+-- exceptions (e.g. functions like `timeout`).  This has been tested on Linux.
 module System.FileLock
   ( FileLock
   , SharedExclusive(..)
