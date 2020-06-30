@@ -17,6 +17,7 @@ build-type:          Simple
 -- extra-source-files:  
 cabal-version:       >=1.10
 extra-source-files:  tests/lock.log.expected
+tested-with:         GHC ==8.2.2 || ==8.6.5 || ==8.8.3
 
 library
   exposed-modules:     System.FileLock
