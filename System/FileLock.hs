@@ -38,7 +38,6 @@ import Control.Applicative
 import qualified Control.Exception as E
 import Control.Monad
 import Data.IORef
-import Data.Traversable (traverse)
 import Data.Typeable
 import Prelude
 
